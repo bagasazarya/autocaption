@@ -1,52 +1,48 @@
-deepai.setApiKey('3c7c00e6-36e9-41e6-881a-57e08795c687');
+import * as openai from 'openai';
 
-let generateButton = document.getElementById('generate-text');
-let inputText = document.getElementById('input-text');
-let output = document.getElementById('output');
-let readText = document.getElementById('read-text');
-let saveButton = document.getElementById('save-text');
-let resultText = "";
+var _pj;
 
-generateButton.onclick = () => query(inputText.value);
+var completion, model_engine, prompt, response;
 
-saveButton.onclick = save;
+function _pj_snippets(container) {
+  function in_es6(left, right) {
+    if (right instanceof Array || typeof right === "string") {
+      return right.indexOf(left) > -1;
+    } else {
+      if (right instanceof Map || right instanceof Set || right instanceof WeakMap || right instanceof WeakSet) {
+        return right.has(left);
+      } else {
+        return left in right;
+      }
+    }
+  }
 
-async function query(text) {
-	if (text == "") return;
-
-	generateButton.classList.add('disabled');
-	generateButton.textContent = "Generating...";
-	document.body.style.cursor = "wait";
-	let response = await deepai.callStandardApi("text-generator", { text: text });
-
-	resultText = response.output;
-	output.textContent = response.output;
-	generateButton.classList.remove('disabled');
-	generateButton.textContent = "Generate Text";
-	document.body.style.cursor = "default";
-	saveButton.style.display = "block";
-
-	if (readText.checked) {
-		let convertedText = new SpeechSynthesisUtterance();
-		convertedText.text = response.output;
-		window.speechSynthesis.speak(convertedText);
-		output.classList.add('scroll');
-		let wpm = 250;
-		let wordCount = resultText.trim().split(/\s+/).length;
-		let readingTime = Math.ceil(wordCount / wpm) * 60;
-		output.style.setProperty('--scroll-time', `${readingTime}s`);
-		let removeScroll = () => { output.classList.remove('scroll'); Math.ceil()}
-		output.addEventListener('animationend', removeScroll);
-	}
+  container["in_es6"] = in_es6;
+  return container;
 }
 
-async function save() {
-	try {
-		await navigator.share({
-			title: 'Generated Text',
-			text: resultText
-		});
-	} catch(err) {
-		console.log(err);
-	}
+_pj = {};
+
+_pj_snippets(_pj);
+
+openai.api_key = "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";
+
+while (true) {
+  model_engine = "text-davinci-003";
+  prompt = input("Enter new prompt: ");
+
+  if (_pj.in_es6("exit", prompt) || _pj.in_es6("quit", prompt)) {
+    break;
+  }
+
+  completion = openai.Completion.create({
+    "engine": model_engine,
+    "prompt": prompt,
+    "max_tokens": 1024,
+    "n": 1,
+    "stop": null,
+    "temperature": 0.5
+  });
+  response = completion.choices[0].text;
+  console.log(response);
 }
